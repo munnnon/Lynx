@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="register-container">
+    <div class="form-switch">
+        <a href="/accounts/login" class="btn-primary">Logowanie</a>
+        <a href="/accounts/register" class="btn-primary full">Rejestracja</a>
+    </div>
+
+    <form method="POST" class="register-form">
+
+      {% csrf_token %}
+        <div class="form-field">
+            {{ form.as_p }}
+        </div>
+
+      <a type="submit" class="btn-primary full">Zarejestruj się</a>
+    </form>
+</div>
+{% endblock %}
