@@ -1,20 +1,32 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Zacznij Uczyć Się<br> Białoruskiego</h1>
-<p>
-    Alfabet, nauka czytania i pisania, potrzebne słownictwo, quizy po każdym skończonym temacie,
-    ciekawe teksty dla praktyki czytania – wszystko w jednej aplikacji!
-</p>
-<a href="#" class="btn-primary full">ZACZNIJ OD REJESTRACJI</a>
+    <div id="landing-page-container">
 
-<h2>Słowa dnia</h2>
-<div class="row-content daily-words">
-    {% for word, translation in daily_words%}
-        <div>
-            <div class="word-box">{{ word }}</div>
-            <div class="translation">{{ translation }}</div>
+        <h1>Zacznij Uczyć Się<br> Białoruskiego</h1>
+        <p>
+            Alfabet, nauka czytania i pisania, potrzebne słownictwo, quizy po każdym skończonym temacie,
+            ciekawe teksty dla praktyki czytania – wszystko w jednej aplikacji!
+        </p>
+        {% if not user.is_authenticated %}
+            <a href="/lynx/accounts/register/" class="btn-primary full">ZACZNIJ OD REJESTRACJI</a>
+        {% else %}
+            <a href="/lynx/lessons" class="btn-primary full">ZACZNIJ NAUKĘ</a>
+        {% endif %}
+
+
+
+        <h2>Słowa dnia</h2>
+        <div class="row-content daily-words">
+            {% for word, translation in daily_words%}
+                <div>
+                    <div class="word-box">{{ word }}</div>
+                    <div class="translation">{{ translation }}</div>
+                </div>
+            {% endfor %}
         </div>
-    {% endfor %}
-</div>
+
+    </div>
+
+
 {% endblock %}

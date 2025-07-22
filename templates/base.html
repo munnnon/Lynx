@@ -6,16 +6,31 @@
     <title>Lynx</title>
       {% load static %}
     <link rel="stylesheet" href="{% static 'style.css' %}">
-    {#    <link rel="icon" href="./favicon.ico" type="image/x-icon">#}
 </head>
 <body>
     <header class="header">
-        <img src="{% static 'lynx.png' %}" alt="logo" class="logo">
-        <nav class="nav">
+        <a href="/lynx/">
+            <img src="{% static 'lynx.png' %}" alt="logo" class="logo">
+        </a>
+        {% if user.is_authenticated %}
+            <nav class="nav">
+                <a href="#" class="btn-primary">EN</a>
+                <a href="/lynx/lessons" class="btn-primary full">Lekcje</a>
+                <a href="/lynx/texts" class="btn-primary full">Teksty</a>
+                <a href="/lynx/accounts/{{ user.id }}" class="btn-primary">{{ user.username }}</a>
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button class="btn-primary" type="submit"> Wylogować się </button>
+                </form>
+
+            </nav>
+        {% else %}
+            <nav class="nav">
             <a href="#" class="btn-primary">EN</a>
-            <a href="#" class="btn-primary">Teksty</a>
-            <a href="#" class="btn-primary full">Rejestracja</a>
+            <a href="/lynx/texts" class="btn-primary">Teksty</a>
+            <a href="/lynx/accounts/register/" class="btn-primary full">Rejestracja</a>
         </nav>
+        {% endif %}
     </header>
 
     <div class="container">

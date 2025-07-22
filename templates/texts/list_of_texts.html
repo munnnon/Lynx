@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% load static %}
+<div class="texts-page">
+    <nav class="texts-nav">
+          <form class="search-form" method="get" action="{% url 'list_of_texts' %}">
+              <input type="text" name="search" placeholder="Wyszukaj nazwę tekstu" value="{{ request.GET.search }}">
+              <button class="btn-primary full" type="submit">Search</button>
+          </form>
+    </nav>
+
+    <div class="texts-grid">
+        {% if search_query and list_of_texts %}
+            {% for text in list_of_texts%}
+                <div class="column-content text-card">
+                    <img src="{% static 'texts.jpg' %}" alt = "book" class="text-img">
+                    <a href="/lynx/texts/{{ text.id }}" class="text-name">{{ text.name }}</a>
+                </div>
+            {% endfor %}
+        {% elif search_query and not list_of_texts %}
+            <p> Nic nie znaleziono... Spróbuj inaczej!</p>
+        {% else %}
+            {% for text in list_of_texts%}
+                <div class="column-content text-card">
+                    <img src="{% static 'texts.jpg' %}" alt = "book" class="text-img">
+                    <a href="/lynx/texts/{{ text.id }}" class="text-name">{{ text.name }}</a>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+</div>
+
+
+{% endblock %}

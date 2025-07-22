@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% load static %}
+<div class="texts-page">
+    <h1>{{ text.name }}</h1>
+
+    <div class="texts-content">
+        {{text.content|linebreaks}}
+    </div>
+
+</div>
+
+
+{% endblock %}

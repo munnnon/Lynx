@@ -18,9 +18,10 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('accounts/', include('accounts.urls')),
-    path('accounts/', include('django.contrib.auth.urls')),
+    path('lynx/admin/', admin.site.urls),
+    path('lynx/accounts/', include('accounts.urls')),
+    path('lynx/accounts/', include('django.contrib.auth.urls')),
     path('lynx/', include('dictionaries.urls')),
+    path('lynx/texts', include('texts.urls')),
 
 ]
