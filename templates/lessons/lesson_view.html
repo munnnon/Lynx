@@ -39,7 +39,7 @@
         document.addEventListener('DOMContentLoaded', function () {
         const questions = Array.from(document.querySelectorAll(".question"))
         let currentIndex = 0;
-        let mistakes = 0;
+        const mistakes = [];
 
         function showQuestion(index) {
             questions.forEach((q, i) => {
@@ -100,7 +100,8 @@
                         : "<span style='color:red;'>Błędna odpowiedź. Poprawna: <strong>" + data["correct-answer"] + "</strong></span>";
 
                     if (!data.correct) {
-                        mistakes = mistakes+1;
+                        mistakes.push(questionId);
+                        console.log("mistakes:", mistakes)
                         const clone = cloneQuestionElement(question);
                         questions.push(clone);
                         document.getElementById('question-container').appendChild(clone);
@@ -121,11 +122,36 @@
             if (currentIndex < questions.length) {
                 showQuestion(currentIndex);
             } else {
-                const result = Math.round(((questions.length - mistakes)/ questions.length)*100);
+                const result = Math.round(((questions.length - mistakes.length)/ questions.length)*100);
                 document.getElementById('question-container').innerHTML = `
                     <h3>Quiz zakończony. Dziękujemy!</h3>
                     <h3>Twój wynik to ${result}%</h3>
                 `;
+
+                const resultData = {
+                    result : result,
+                    questions: questions,
+                    lesson_id: {{ lesson.id }},
+                    block: {{ lesson.block.id }},
+                    mistakes: mistakes,
+                    csrfmiddlewaretoken: '{{ csrf_token}}'
+                };
+
+                fetch("{% url 'save_user_performance' %}",{
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify(resultData)
+                })
+                    .then(response => response.json())
+                    .then(resultData => {
+                        console.log('Results saved:', resultData);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error)
+                    });
             }
         }
 

@@ -1,8 +1,12 @@
+import json
+from collections import Counter
+
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
 
-from .models import Lesson, UserLesson, UserBlock, Block, Question
+from .models import Lesson, UserLesson, UserBlock, Block, Question, UsersAnswers
 
 
 @login_required(login_url='login')
@@ -15,12 +19,13 @@ def blocks_board_view(request):
     for block in blocks:
         try:
             user_block = UserBlock.objects.get(user=user, block = block)
-            progress = user_block.completed_lessons / block.number_of_lessons * 100
+            progress = int(user_block.completed_lessons) / int(block.number_of_lessons) * 100
             users_progress[block.id] = round(progress)
         except UserBlock.DoesNotExist:
             users_progress[block.id] = 0
         print(users_progress[block.id])
-
+    print(users_progress)
+    print (type(users_progress))
 
     return render(request, 'lessons/lesson_board.html',
                   {
@@ -81,3 +86,42 @@ def check_answer(question, user_answer):
 
 
     return {"correct": is_correct, "correct-answer": question.correct_answer}
+@csrf_exempt
+def save_user_performance(request):
+    if request.method== 'POST':
+        try:
+            data = json.loads(request.body)
+            result = data.get('result')
+            lesson_id = data.get('lesson_id')
+            lesson = Lesson.objects.get(id = lesson_id)
+            block_id = data.get('block')
+            block = Block.objects.get(id = block_id)
+
+            mistaken_questions_id = data.get('mistakes')
+            questions = Question.objects.filter(id__in = mistaken_questions_id)
+            print('Given list: ', mistaken_questions_id, '\nQuestions list: ',questions )
+
+            UserLesson.objects.update_or_create(
+                user=request.user,
+                lesson= lesson,
+                defaults={
+                    'result': int(result)
+                }
+            )
+            for question in questions:
+                UsersAnswers.objects.update_or_create(
+                    user = request.user,
+                    if_correct = False,
+                    lesson = lesson,
+                    block = block,
+                    question= question,
+                )
+
+            UserBlock.objects.update_or_create(
+                user=request.user,
+                block = block
+            )
+            return JsonResponse({'status': 'success'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    return JsonResponse({'status': 'error'}, status=405)

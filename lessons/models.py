@@ -7,12 +7,14 @@ class Block(models.Model):
     name = models.CharField(max_length=255)
     users = models.ManyToManyField(User, through='UserBlock', related_name='blocks')
 
+    @property
+    def number_of_lessons(self):
+        return self.lesson_set.count()
+
     def __str__(self):
         return self.name
 
-    @property
-    def number_of_lessons (self):
-        return self.lesson_set.count
+
 
 class Lesson(models.Model):
     name = models.CharField(max_length=255)
@@ -50,7 +52,7 @@ class UserBlock(models.Model):
 class UserLesson(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    result= models.IntegerField
+    result= models.IntegerField( default= 0)
 
     class Meta:
         unique_together = ('user', 'lesson')
@@ -82,7 +84,7 @@ class Question(models.Model):
 class UsersAnswers(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    if_correct = models.BooleanField
+    if_correct = models.BooleanField(default= False)
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     block = models.ForeignKey(Block, on_delete=models.CASCADE)
 
