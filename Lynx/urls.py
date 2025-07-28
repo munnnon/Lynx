@@ -23,6 +23,6 @@ urlpatterns = [
     path('lynx/accounts/', include('django.contrib.auth.urls')),
     path('lynx/', include('dictionaries.urls')),
     path('lynx/texts', include('texts.urls')),
-    path('lynx/lessons', include('lessons.urls')),
+    path('lynx/lessons/', include('lessons.urls')),
 
 ]

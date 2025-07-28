@@ -109,31 +109,52 @@ def create_questions():
             "answer_variants": ""
         },
         {
+            "content": "Jak brzmi ta litera:'Б'?",
+            "question_type": "W",
+            "correct_answer": "b",
+            "lessons": [lessons[1]],
+            "answer_variants": ""
+        },
+        {
+            "content": "Jak brzmi ta litera:'В'?",
+            "question_type": "W",
+            "correct_answer": "w",
+            "lessons": [lessons[1]],
+            "answer_variants": ""
+        },
+        {
+            "content": "Jak brzmi ta litera:'Г'?",
+            "question_type": "W",
+            "correct_answer": "g",
+            "lessons": [lessons[1]],
+            "answer_variants": ""
+        },
+        {
             "content": "Jak powiedzieć 'Dzień dobry' po białorusku?",
             "question_type": "ABCD",
             "answer_variants": "Добры дзень|Добрай раніцы|Да пабачэння|Добрай ночы",
             "correct_answer": "Добры дзень",
-            "lessons": [lessons[1], lessons[2]]
+            "lessons": [lessons[3], lessons[2]]
         },
         {
             "content": "Jak brzmi liczba 5 po białorusku?",
             "question_type": "ABCD",
             "answer_variants": "Чатыры|Пяць|Шэсць|Сем",
             "correct_answer": "Пяць",
-            "lessons": [lessons[1]]
+            "lessons": [lessons[2]]
         },
         {
             "content": "Jak zapytać 'Ile to kosztuje?' po białorusku?",
             "question_type": "W",
             "correct_answer": "Колькі гэта каштуе?",
-            "lessons": [lessons[2]],
+            "lessons": [lessons[3]],
             "answer_variants": ""
         },
         {
             "content": "W języku białoruskim istnieją rodzajniki określone",
             "question_type": "TF",
             "correct_answer": "False",
-            "lessons": [lessons[3]],
+            "lessons": [lessons[4]],
             "answer_variants": ""
         },
     ]

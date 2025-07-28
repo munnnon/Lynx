@@ -1,0 +1,10 @@
+{% load custom_filters %}
+
+    {% with variants=question.answer_variants|split_by:"|"%}
+        {% for variant in variants %}
+            <input type="radio" id="variant-{{ question.id }}-{{ forloop.counter }}"
+                   name="answer-{{ question.id }}" value="{{ variant }}">
+            <label for="variant-{{ question.id }}-{{ forloop.counter }}">{{ variant }}</label><br>
+        {% endfor %}
+    {% endwith %}
+

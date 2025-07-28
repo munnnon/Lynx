@@ -6,7 +6,7 @@
     <div class="courses-carousel">
         <button class="carousel-btn prev-btn">&lt;</button>
 
-        <div id="course-container">
+        <div id="scroll-container">
             {% for course in courses %}
                 <div class="course-card" data-course-id = {{ course.id }}>
 
@@ -30,10 +30,12 @@
     <script>
 
     document.addEventListener('DOMContentLoaded', function() {
-        const container = document.querySelector('#course-container');
+        const container = document.querySelector('#scroll-container');
         const prevBtn = document.querySelector('.prev-btn');
         const nextBtn = document.querySelector('.next-btn');
-        const cardWidth = 200; // Szerokość karty + margines
+        const cards = document.querySelectorAll('.course-card');
+
+        const cardWidth = cards[0] ?cards[0].offsetWidth+parseInt(window.getComputedStyle(cards[0]).marginRight) : 250;
 
         nextBtn.addEventListener('click', function() {
             container.scrollBy({ left: cardWidth, behavior: 'smooth' });
@@ -48,7 +50,7 @@
         document.querySelectorAll('.course-card').forEach(card =>{
             card.addEventListener('click', () => {
                 const courseId = card.dataset.courseId;
-                fetch(`/${courseId}/lessons/`)
+                window.location.href = `${courseId}`;
 
             })
         })

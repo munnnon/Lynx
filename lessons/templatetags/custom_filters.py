@@ -5,3 +5,6 @@ register = template.Library()
 @register.filter
 def dict_get(d, key):
     return  d.get(key, 0)
+@register.filter
+def split_by(value, delimiter):
+    return value.split(delimiter)

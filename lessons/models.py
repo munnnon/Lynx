@@ -50,7 +50,7 @@ class UserBlock(models.Model):
 class UserLesson(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    result = models.IntegerField
+    result= models.IntegerField
 
     class Meta:
         unique_together = ('user', 'lesson')
@@ -91,4 +91,3 @@ class UsersAnswers(models.Model):
 
     def __str__(self):
         return f"{self.user} answer {self.question} corect({self.if_correct}) from lesson {self.lesson} in the block {self.block}"
-

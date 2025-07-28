@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load custom_filters %}
+    <h2>{{ lesson.name}}</h2>
+    <div class="landing-page-container">
+        <p>
+            {{ lesson.description }}
+        </p>
+    </div>
+
+    <div id="question-container">
+        {% for question_id in questions_list %}
+           {% with question=questions_dict|dict_get:question_id %}
+                <div class="course-card question {% if not forloop.first %}hidden{% endif %}"
+                     data-question-id = "{{ question.id }}"
+                     data-question-type = "{{ question.question_type }}">
+
+                    <h3>{{ question.content }}</h3>
+
+                    <form>
+                        {% if question.question_type == 'ABCD' %}
+                            {% include 'lessons/question_types/abcd.html' %}
+                        {% elif question.question_type == 'W' %}
+                            {% include 'lessons/question_types/written.html' %}
+                        {% elif question.question_type == 'TF' %}
+                            {% include 'lessons/question_types/true_false.html' %}
+                        {% endif %}
+                        <button class="btn-primary full" id="check-answer" type="button" value="">Sprawdź odpowiedź</button>
+                    </form>
+
+                    <button class="btn-primary full next-question hidden"  type="button" >Dalej</button>
+                </div>
+            {% endwith %}
+        {% endfor %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        const questions = Array.from(document.querySelectorAll(".question"))
+        let currentIndex = 0;
+        let mistakes = 0;
+
+        function showQuestion(index) {
+            questions.forEach((q, i) => {
+                q.classList.toggle('hidden', i !== index);
+            });
+        }
+        function cloneQuestionElement(original){
+            const clone = original.cloneNode(true);
+            const checkBtn = clone.querySelector('#check-answer');
+            const nextBtn = clone.querySelector('.next-question');
+
+            checkBtn.addEventListener('click', handleCheck(clone, checkBtn, nextBtn));
+            nextBtn.addEventListener('click', handleNext);
+            clone.classList.add('hidden');
+
+
+            return clone;
+        }
+
+        function handleCheck(question, checkBtn, nextBtn){
+            return function () {
+                const questionId = question.dataset.questionId;
+                const questionType = question.dataset.questionType;
+                let userAnswer;
+
+                if (questionType === "ABCD" || questionType === "TF") {
+                    const selected = question.querySelector('input[type="radio"]:checked');
+                    if (!selected) {
+                        alert("Wybierz odpowiedź");
+                        return;
+                    }
+                    userAnswer = selected.value;
+                } else if (questionType === 'W') {
+                    const input = question.querySelector('.written-answer');
+                    userAnswer = input.value;
+                    if (!userAnswer) {
+                        alert("Wpisz odpowiedź.");
+                        return;
+                    }
+                }
+
+                const formData = new FormData();
+                formData.append('question_id', questionId);
+                formData.append('user_answer', userAnswer);
+                formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+                fetch("{% url 'check_answer_ajax' %}", {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const feedback = document.createElement('div');
+                    feedback.classList.add('answer-result');
+                    feedback.style.marginTop = '10px';
+                    feedback.innerHTML = data.correct
+                        ? "<span style='color:green;'>Poprawna odpowiedź!</span>"
+                        : "<span style='color:red;'>Błędna odpowiedź. Poprawna: <strong>" + data["correct-answer"] + "</strong></span>";
+
+                    if (!data.correct) {
+                        mistakes = mistakes+1;
+                        const clone = cloneQuestionElement(question);
+                        questions.push(clone);
+                        document.getElementById('question-container').appendChild(clone);
+                    }
+
+                    const existing = question.querySelector('.answer-result');
+                    if (existing) existing.remove();
+                    question.appendChild(feedback);
+
+                    checkBtn.classList.add('hidden');
+                    nextBtn.classList.remove('hidden');
+                });
+            };
+        }
+
+        function handleNext() {
+            currentIndex++;
+            if (currentIndex < questions.length) {
+                showQuestion(currentIndex);
+            } else {
+                const result = Math.round(((questions.length - mistakes)/ questions.length)*100);
+                document.getElementById('question-container').innerHTML = `
+                    <h3>Quiz zakończony. Dziękujemy!</h3>
+                    <h3>Twój wynik to ${result}%</h3>
+                `;
+            }
+        }
+
+        questions.forEach((question)=>{
+            const checkBtn = question.querySelector('#check-answer');
+            const nextBtn = question.querySelector('.next-question');
+            checkBtn.addEventListener('click', handleCheck(question, checkBtn, nextBtn));
+            nextBtn.addEventListener('click', handleNext);
+        });
+        showQuestion(currentIndex);
+    });
+    </script>
+
+{% endblock %}
