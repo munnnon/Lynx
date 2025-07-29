@@ -2,7 +2,11 @@
 {% block content %}
 {% load static %}
 {% load custom_filters %}
-    <h2>Gotowy na nową lekcję?</h2>
+    <div class="row-content">
+        <button class="btn-primary" id="previous-page"> &larr;</button>
+        <h2>Gotowy na nową lekcję?</h2>
+    </div>
+
     <div class="courses-carousel">
         <button class="carousel-btn prev-btn">&lt;</button>
 
@@ -34,6 +38,7 @@
         const prevBtn = document.querySelector('.prev-btn');
         const nextBtn = document.querySelector('.next-btn');
         const cards = document.querySelectorAll('.course-card');
+        const prevPage = document.querySelector('#previous-page')
 
         const cardWidth = cards[0] ?cards[0].offsetWidth+parseInt(window.getComputedStyle(cards[0]).marginRight) : 250;
 
@@ -43,6 +48,10 @@
 
         prevBtn.addEventListener('click', function() {
             container.scrollBy({ left: -cardWidth, behavior: 'smooth' });
+        });
+
+        prevPage.addEventListener('click', () => {
+            window.history.back();
         });
 
         /*Managing click on course-card so it will show lessons in clicked block*/

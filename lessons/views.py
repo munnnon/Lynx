@@ -30,7 +30,7 @@ def blocks_board_view(request):
     return render(request, 'lessons/lesson_board.html',
                   {
                       'courses': blocks,
-                      'progress': users_progress
+                      'progress': users_progress,
                   })
 
 @login_required(login_url='login')
@@ -49,7 +49,7 @@ def lessons_board_view(request, block_id):
 
     return render(request, 'lessons/lesson_board.html', {
         'courses': lessons,
-        'progress': users_progress
+        'progress': users_progress,
     })
 
 @login_required(login_url='login')

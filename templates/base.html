@@ -17,7 +17,7 @@
                 <a href="#" class="btn-primary">EN</a>
                 <a href="/lynx/lessons" class="btn-primary full">Lekcje</a>
                 <a href="/lynx/texts" class="btn-primary full">Teksty</a>
-                <a href="/lynx/accounts/{{ user.id }}" class="btn-primary">{{ user.username }}</a>
+                <a href="{% url 'account_settings' %}" class="btn-primary">{{ user.username }}</a>
                 <form action="{% url 'logout' %}" method="post">
                     {% csrf_token %}
                     <button class="btn-primary" type="submit"> Wylogować się </button>

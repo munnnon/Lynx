@@ -75,6 +75,8 @@ body {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    align-items: center;
+
 }
 
 .btn-primary {
@@ -90,7 +92,6 @@ body {
     margin: 0 5px;
     padding: 8px 16px;
     border-radius: 25px;
-    text-decoration: none;
     outline: none;
     box-shadow: none;
     width: fit-content;
@@ -98,8 +99,8 @@ body {
 
 button {
     font-family: 'Outfit', monospace;
-    font-weight: bold;
     border: none;
+    font-size: 17px;
 }
 
 input {
@@ -293,6 +294,7 @@ h1, h2 {
 }
 
 .progress-view {
+    width: 100%;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -384,4 +386,7 @@ div#scroll-container{
 
 .hidden{
     display: none;
+}
+#previous-page {
+    font-size: 40px;
 }

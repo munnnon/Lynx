@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="register-container">
+        <h3>Witamy {{ user.username }}</h3>
+        <div class="password-change">
+             <p><a href="{% url 'password_change' %}" class="btn-primary full">Zmiana hasła</a> </p>
+        </div>
+
+        <div class="username-change">
+             <form method="POST" class="column-content" action="{% url 'username_change' %}">
+                 <div class="form-field">
+                     <p>
+                        <label for="username-change">Zmiana username</label>
+                         <input type="text" name="username-change" placeholder="Wpisz nowy username" value="{{ user.username }}">
+                     </p>
+                 </div>
+
+                <button type="submit" class="btn-primary full"> Potwierdź</button>
+            </form>
+        </div>
+
+        <div class="email-change">
+            <form method="POST" class="column-content" action="{% url 'email_change' %}">
+                <div class="form-field">
+                    <p>
+                        <label for="email-change">Zmiana email</label>
+                        <input type="text" name="email-change" placeholder="Wpisz nowy email" value="{{ user.email }}">
+                    </p>
+                </div>
+                <button type="submit" class="btn-primary full"> Potwierdź</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

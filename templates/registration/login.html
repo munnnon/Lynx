@@ -16,10 +16,11 @@
 
             <form method="POST" class="column-content">
 
-              {% csrf_token %}
+                {% csrf_token %}
                 <div class="form-field">
                    {{ form.as_p }}
                 </div>
+                <p><a href="{% url 'password_reset' %}" class="btn-primary">Zapomniałeś hasło?</a></p>
 
               <button type="submit" class="btn-primary full">Zaloguj się</button>
             </form>
