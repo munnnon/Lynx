@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 
+from accounts.views import update_streak
 from .models import Lesson, UserLesson, UserBlock, Block, Question, UsersAnswers
 
 
@@ -60,11 +61,11 @@ def lesson_view(request, block_id, lesson_id):
     questions_dict = {question.id:question for question in questions}
 
 
-    return render(request, 'lessons/lesson_view.html', { 'lesson': lesson,
-                                # 'questions': questions,
-                                'questions_list': questions_list,
-                                'questions_dict': questions_dict,
-                                 })
+    return render(request, 'lessons/lesson_view.html', {
+        'lesson': lesson,
+        'questions_list': questions_list,
+        'questions_dict': questions_dict,
+         })
 
 def check_answer_ajax(request):
     if request.method == 'POST':
@@ -108,6 +109,8 @@ def save_user_performance(request):
                     'result': int(result)
                 }
             )
+            update_streak(request.user)
+
             for question in questions:
                 UsersAnswers.objects.update_or_create(
                     user = request.user,

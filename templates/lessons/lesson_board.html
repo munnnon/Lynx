@@ -3,7 +3,7 @@
 {% load static %}
 {% load custom_filters %}
     <div class="row-content">
-        <button class="btn-primary" id="previous-page"> &larr;</button>
+        {% include 'up_page.html' %}
         <h2>Gotowy na nową lekcję?</h2>
     </div>
 
@@ -38,7 +38,6 @@
         const prevBtn = document.querySelector('.prev-btn');
         const nextBtn = document.querySelector('.next-btn');
         const cards = document.querySelectorAll('.course-card');
-        const prevPage = document.querySelector('#previous-page')
 
         const cardWidth = cards[0] ?cards[0].offsetWidth+parseInt(window.getComputedStyle(cards[0]).marginRight) : 250;
 
@@ -50,19 +49,13 @@
             container.scrollBy({ left: -cardWidth, behavior: 'smooth' });
         });
 
-        prevPage.addEventListener('click', () => {
-            window.history.back();
-        });
-
-        /*Managing click on course-card so it will show lessons in clicked block*/
-
         document.querySelectorAll('.course-card').forEach(card =>{
             card.addEventListener('click', () => {
                 const courseId = card.dataset.courseId;
                 window.location.href = `${courseId}`;
 
             })
-        })
+        });
     });
 
     </script>

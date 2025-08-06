@@ -1,3 +1,5 @@
+from datetime import timezone
+
 from django.db import models
 from django.contrib.auth import get_user_model
 
@@ -53,6 +55,7 @@ class UserLesson(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     result= models.IntegerField( default= 0)
+    completed_at = models.DateField (auto_now= True )
 
     class Meta:
         unique_together = ('user', 'lesson')

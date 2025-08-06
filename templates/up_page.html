@@ -1,0 +1,15 @@
+<button class="btn-primary" id="up-page"> &larr;</button>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const upButton = document.querySelector('#up-page');
+        upButton.addEventListener('click', () => {
+            const currentPath = window.location.pathname;
+            const pathParts = currentPath.split('/').filter(part => part);
+
+            if (pathParts.length > 0) {
+                pathParts.pop();
+                window.location.href ='/' + pathParts.join('/') + '/';
+            }
+        });
+    });
+</script>

@@ -2,12 +2,19 @@
 {% block content %}
 {% load static %}
 {% load custom_filters %}
-    <h2>{{ lesson.name}}</h2>
-    <div class="landing-page-container">
-        <p>
-            {{ lesson.description }}
-        </p>
+    <div class="row-content">
+        {% include 'up_page.html' %}
+        <div>
+            <h2>{{ lesson.name}}</h2>
+            <div class="landing-page-container">
+                <p>
+                    {{ lesson.description }}
+                </p>
+            </div>
+
+        </div>
     </div>
+
 
     <div id="question-container">
         {% for question_id in questions_list %}
@@ -18,18 +25,33 @@
 
                     <h3>{{ question.content }}</h3>
 
-                    <form>
-                        {% if question.question_type == 'ABCD' %}
-                            {% include 'lessons/question_types/abcd.html' %}
-                        {% elif question.question_type == 'W' %}
-                            {% include 'lessons/question_types/written.html' %}
-                        {% elif question.question_type == 'TF' %}
-                            {% include 'lessons/question_types/true_false.html' %}
-                        {% endif %}
-                        <button class="btn-primary full" id="check-answer" type="button" value="">Sprawdź odpowiedź</button>
-                    </form>
-
-                    <button class="btn-primary full next-question hidden"  type="button" >Dalej</button>
+                    <div class="column-content answer-form">
+                        <div class="answer-input">
+                            {% if question.question_type == 'ABCD' %}
+                                {% with variants=question.answer_variants|split_by:"|"%}
+                                    {% for variant in variants %}
+                                        <input type="radio" id="variant-{{ question.id }}-{{ forloop.counter }}"
+                                               name="answer-{{ question.id }}" value="{{ variant }}">
+                                        <label for="variant-{{ question.id }}-{{ forloop.counter }}">{{ variant }}</label><br>
+                                    {% endfor %}
+                                {% endwith %}
+{#                                {% include 'lessons/question_types/abcd.html' %}#}
+                            {% elif question.question_type == 'W' %}
+                                <input name="answer-{{ question.id }}" placeholder="Wpisz swoją odpowiedź..."  class="written-answer" autocomplete="off" value="" autofocus>
+{#                                {% include 'lessons/question_types/written.html' %}#}
+                            {% elif question.question_type == 'TF' %}
+                                <input type="radio" id="true-{{ question.id }}" name="answer-{{ question.id }}"
+                                       value="True">
+                                <label for="True-{{ question.id }}">Prawda</label><br>
+                                <input type="radio" id="true-{{ question.id }}" name="answer-{{ question.id }}"
+                                       value="False">
+                                <label for="False">Fałsz</label><br>
+{#                                {% include 'lessons/question_types/true_false.html' %}#}
+                            {% endif %}
+                        </div>
+                        <button class="btn-primary full check-answer" type="button">Sprawdź odpowiedź</button>
+                        <button class="btn-primary full next-question hidden"  type="button" >Dalej</button>
+                    </div>
                 </div>
             {% endwith %}
         {% endfor %}
@@ -44,17 +66,43 @@
         function showQuestion(index) {
             questions.forEach((q, i) => {
                 q.classList.toggle('hidden', i !== index);
+                const input = q.querySelector('.written-answer');
+
+                if (input) {
+                    if (i === index) {
+                        input.setAttribute('autofocus', '');
+                        input.focus();
+                    } else {
+                        input.removeAttribute('autofocus');
+                        input.blur();
+                    }
+                }
             });
         }
         function cloneQuestionElement(original){
             const clone = original.cloneNode(true);
-            const checkBtn = clone.querySelector('#check-answer');
+            const checkBtn = clone.querySelector('.check-answer');
             const nextBtn = clone.querySelector('.next-question');
 
             checkBtn.addEventListener('click', handleCheck(clone, checkBtn, nextBtn));
             nextBtn.addEventListener('click', handleNext);
-            clone.classList.add('hidden');
 
+            const inputs = clone.querySelectorAll('.column-content.answer-form .answer-input input');
+            inputs.forEach(input => {
+                if (input.type === 'radio') {
+                    input.checked = false; // Reset radio buttons
+                } else {
+                    input.value = '';                    // Wartość DOM
+                    input.setAttribute('value', '');     // Atrybut HTML
+                    input.defaultValue = '';             // Domyślna wartość
+                    input.removeAttribute('value');
+                }
+            });
+
+            const feedbackElements = clone.querySelectorAll(`[data-question-id="${original.id}"]`);
+            feedbackElements.forEach(element => element.remove());
+
+            clone.classList.add('hidden');
 
             return clone;
         }
@@ -101,7 +149,6 @@
 
                     if (!data.correct) {
                         mistakes.push(questionId);
-                        console.log("mistakes:", mistakes)
                         const clone = cloneQuestionElement(question);
                         questions.push(clone);
                         document.getElementById('question-container').appendChild(clone);
@@ -110,6 +157,11 @@
                     const existing = question.querySelector('.answer-result');
                     if (existing) existing.remove();
                     question.appendChild(feedback);
+
+                    question.querySelectorAll('.answer-input input').forEach(input => {
+                        input.disabled = true;
+                    });
+
 
                     checkBtn.classList.add('hidden');
                     nextBtn.classList.remove('hidden');
@@ -126,6 +178,8 @@
                 document.getElementById('question-container').innerHTML = `
                     <h3>Quiz zakończony. Dziękujemy!</h3>
                     <h3>Twój wynik to ${result}%</h3>
+                    <p><a href="#" class="btn-primary">Lista lekcji</a></p>
+                    <p><a href="#" class="btn-primary full">Następna lekcja</a></p>
                 `;
 
                 const resultData = {
@@ -156,12 +210,26 @@
         }
 
         questions.forEach((question)=>{
-            const checkBtn = question.querySelector('#check-answer');
+            const checkBtn = question.querySelector('.check-answer');
             const nextBtn = question.querySelector('.next-question');
             checkBtn.addEventListener('click', handleCheck(question, checkBtn, nextBtn));
             nextBtn.addEventListener('click', handleNext);
         });
         showQuestion(currentIndex);
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                const currentQuestion = questions[currentIndex];
+                const checkBtn = currentQuestion.querySelector('.check-answer');
+                const nextBtn = currentQuestion.querySelector('.next-question');
+
+                event.preventDefault();
+                if (!checkBtn.classList.contains('hidden')) {
+                    handleCheck(currentQuestion, checkBtn, nextBtn)();
+                } else if (!nextBtn.classList.contains('hidden')) {
+                    handleNext();
+                }
+            }
+        });
     });
     </script>
 

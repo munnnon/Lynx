@@ -4,7 +4,11 @@
 
 {% load static %}
 <div class="texts-page">
-    <h1>{{ text.name }}</h1>
+    <div class="row-content">
+        {% include 'up_page.html' %}zz
+        <h1>{{ text.name }}</h1>
+    </div>
+
 
     <div class="texts-content">
         {{text.content|linebreaks}}

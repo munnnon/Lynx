@@ -5,27 +5,30 @@
 {% load static %}
 <div class="texts-page">
     <nav class="texts-nav">
-          <form class="search-form" method="get" action="{% url 'list_of_texts' %}">
-              <input type="text" name="search" placeholder="Wyszukaj nazwę tekstu" value="{{ request.GET.search }}">
-              <button class="btn-primary full" type="submit">Search</button>
-          </form>
+        <button class="btn-primary hidden" id="prev-page"> &larr; </button>
+        {% include 'up_page.html' %}
+
+        <form class="search-form" method="get" action="{% url 'list_of_texts' %}">
+          <input type="text" name="search" placeholder="Wyszukaj nazwę tekstu" value="{{ request.GET.search }}">
+          <button class="btn-primary full" type="submit">Search</button>
+        </form>
     </nav>
 
     <div class="texts-grid">
         {% if search_query and list_of_texts %}
             {% for text in list_of_texts%}
-                <div class="column-content text-card">
+                <div class="column-content text-card" data-text-id = {{ text.id }}>
                     <img src="{% static 'texts.jpg' %}" alt = "book" class="text-img">
-                    <a href="/lynx/texts/{{ text.id }}" class="text-name">{{ text.name }}</a>
+                    <p class="text-name">{{ text.name }}</p>
                 </div>
             {% endfor %}
         {% elif search_query and not list_of_texts %}
             <p> Nic nie znaleziono... Spróbuj inaczej!</p>
         {% else %}
             {% for text in list_of_texts%}
-                <div class="column-content text-card">
+                <div class="column-content text-card" data-text-id = {{ text.id }}>
                     <img src="{% static 'texts.jpg' %}" alt = "book" class="text-img">
-                    <a href="/lynx/texts/{{ text.id }}" class="text-name">{{ text.name }}</a>
+                    <p  class="text-name">{{ text.name }}</p>
                 </div>
             {% endfor %}
         {% endif %}
@@ -33,5 +36,25 @@
 
 </div>
 
+    <script>
+    document.addEventListener('DOMContentLoaded', function (){
+        const prevPage = document.querySelector('#prev-page');
+        prevPage.classList.remove('hidden');
+        const upButton = document.querySelector('#up-page')
+        upButton.classList.add('hidden');
+
+        prevPage.addEventListener('click', () => {
+            window.location.href = '/lynx/texts/';
+        });
+
+        document.querySelectorAll('.text-card').forEach(text =>{
+            text.addEventListener('click', () => {
+                const textId = text.dataset.textId;
+                window.location.href =`${textId}`;
+            })
+        });
+    });
+
+    </script>
 
 {% endblock %}
