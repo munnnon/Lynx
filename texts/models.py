@@ -4,6 +4,7 @@ User = get_user_model()
 
 
 class Text(models.Model):
+    """Model for storing texts that can be associated with users."""
     name = models.CharField(max_length=255)
     content = models.TextField(max_length=2000)
     users = models.ManyToManyField(User, through='UserText', related_name='texts')
@@ -12,6 +13,7 @@ class Text(models.Model):
         return self.name
 
 class UserText(models.Model):
+    """Model that tracks when a user has read the given text."""
     text = models.ForeignKey(Text, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     read_at =  models.DateTimeField(auto_now_add=True)

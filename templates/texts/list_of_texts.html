@@ -3,14 +3,14 @@
 {% block content %}
 
 {% load static %}
-<div class="texts-page">
+<div class="texts-page" data-search="{{ search_query|default:'' }}">
     <nav class="texts-nav">
-        <button class="btn-primary hidden" id="prev-page"> &larr; </button>
+       <button class="btn-primary hidden" id="prev-page"> &larr; </button>
         {% include 'up_page.html' %}
 
         <form class="search-form" method="get" action="{% url 'list_of_texts' %}">
           <input type="text" name="search" placeholder="Wyszukaj nazwę tekstu" value="{{ request.GET.search }}">
-          <button class="btn-primary full" type="submit">Search</button>
+          <button class="btn-primary full" type="submit">Wyszukaj</button>
         </form>
     </nav>
 
@@ -39,13 +39,16 @@
     <script>
     document.addEventListener('DOMContentLoaded', function (){
         const prevPage = document.querySelector('#prev-page');
-        prevPage.classList.remove('hidden');
-        const upButton = document.querySelector('#up-page')
-        upButton.classList.add('hidden');
+        const upButton = document.querySelector('#up-page');
+        const searchQuery = document.querySelector('.texts-page').dataset.search;
 
-        prevPage.addEventListener('click', () => {
-            window.location.href = '/lynx/texts/';
-        });
+        if (searchQuery){
+            prevPage.classList.remove('hidden');
+            upButton.classList.add('hidden');
+            prevPage.addEventListener('click', () => {
+                window.location.href = '/lynx/texts/';
+            });
+        }
 
         document.querySelectorAll('.text-card').forEach(text =>{
             text.addEventListener('click', () => {

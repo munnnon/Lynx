@@ -29,7 +29,7 @@ body {
     padding-left: 40px;
     padding-right: 40px;
     margin: auto;
-    width: 65%;
+    width: 50%;
 }
 
 .header {
@@ -202,7 +202,7 @@ h1, h2 {
     align-items: center;
 }
 
-.form-field{
+.form-field p{
     display: flex;
     flex-direction: column;
 }

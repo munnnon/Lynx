@@ -1,5 +1,4 @@
 import json
-from collections import Counter
 
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -12,6 +11,15 @@ from .models import Lesson, UserLesson, UserBlock, Block, Question, UsersAnswers
 
 @login_required(login_url='login')
 def blocks_board_view(request):
+    """
+    Display all blocks with user's progress for each block.
+
+    Args:
+        request (HttpRequest): Incoming HTTP request.
+
+    Returns:
+        HttpResponse: Renders 'lesson_board.html' with all blocks and user's completion percentage.
+    """
     user = request.user
     users_progress = {}
 
@@ -36,6 +44,16 @@ def blocks_board_view(request):
 
 @login_required(login_url='login')
 def lessons_board_view(request, block_id):
+    """
+    Display all lessons for a specific block with user's performance.
+
+    Args:
+        request (HttpRequest): Incoming HTTP request.
+        block_id (int): ID of the block whose lessons are displayed.
+
+    Returns:
+        HttpResponse: Renders 'lesson_board.html' with lessons and user's results.
+    """
     user = request.user
     users_progress = {}
 
@@ -55,11 +73,21 @@ def lessons_board_view(request, block_id):
 
 @login_required(login_url='login')
 def lesson_view(request, block_id, lesson_id):
+    """
+    Display a specific lesson and its questions.
+
+    Args:
+        request (HttpRequest): Incoming HTTP request.
+        block_id (int): ID of the block containing the lesson.
+        lesson_id (int): ID of the lesson to display.
+
+    Returns:
+        HttpResponse: Renders 'lesson_view.html' with lesson, list of question IDs, and question objects.
+    """
     lesson = Lesson.objects.get(id = lesson_id)
     questions = lesson.question_set.all()
     questions_list = list(questions.values_list('id', flat = True))
     questions_dict = {question.id:question for question in questions}
-
 
     return render(request, 'lessons/lesson_view.html', {
         'lesson': lesson,
@@ -68,6 +96,17 @@ def lesson_view(request, block_id, lesson_id):
          })
 
 def check_answer_ajax(request):
+    """
+    AJAX endpoint to check if a user's answer is correct.
+
+    Expects POST parameters:
+        - question_id: ID of the question
+        - user_answer: Answer provided by the user
+
+    Returns:
+        JsonResponse: {"correct": bool, "correct-answer": str} if valid,
+                      {"error": str} with 400 status if invalid.
+    """
     if request.method == 'POST':
         question_id = request.POST.get('question_id')
         user_answer = request.POST.get('user_answer')
@@ -80,6 +119,16 @@ def check_answer_ajax(request):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 def check_answer(question, user_answer):
+    """
+    Check if a user's answer matches the correct answer.
+
+    Args:
+        question (Question): Question object.
+        user_answer (str): Answer provided by the user.
+
+    Returns:
+        dict: {"correct": bool, "correct-answer": str}
+    """
     if question.question_type == 'W':
         is_correct = user_answer.lower().strip() == question.correct_answer.lower().strip()
     else:
@@ -89,6 +138,26 @@ def check_answer(question, user_answer):
     return {"correct": is_correct, "correct-answer": question.correct_answer}
 @csrf_exempt
 def save_user_performance(request):
+    """
+    Save user's lesson performance and update streaks.
+
+    Expects a JSON body with:
+        - result (int): User's result in the lesson.
+        - lesson_id (int): ID of the lesson.
+        - block (int): ID of the block.
+        - mistakes (list[int]): IDs of questions answered incorrectly.
+
+    Updates:
+        - UserLesson: Stores result for the lesson.
+        - UsersAnswers: Records incorrectly answered questions.
+        - UserBlock: Updates block progress.
+        - User streak: Updates streak if user is authenticated.
+
+    Returns:
+        JsonResponse: {'status': 'success'} on success,
+                      {'status': 'error', 'message': str} on error,
+                      or 405 if the method is not POSTed.
+    """
     if request.method== 'POST':
         try:
             data = json.loads(request.body)
@@ -100,7 +169,6 @@ def save_user_performance(request):
 
             mistaken_questions_id = data.get('mistakes')
             questions = Question.objects.filter(id__in = mistaken_questions_id)
-            print('Given list: ', mistaken_questions_id, '\nQuestions list: ',questions )
 
             UserLesson.objects.update_or_create(
                 user=request.user,
